@@ -30,16 +30,24 @@ async function connectAssistant(diff) {
         messages: [{ role: "system", content: content }],
         model: "gpt-3.5-turbo",
     });
-    console.log(completion.choices[0].message.content);
-
-    const summary = completion.choices[0].message.content
+    const summary = JSON.parse(completion.choices[0].message.content);
+    console.log(summary);
     commitMessage(summary)
 }
 
 async function commitMessage(summary) {
+    const { message, description } = summary;
+
     await git.add(".");
-    const message = await git.commit(summary);
-    console.log(message);
+
+    const commitContents = [message];
+    if (description) {
+        commitContents.push('-m', description);
+    }
+
+    const commit = await git.commit(commitContents);
+
+    console.log(commit);
 }
 
 getDiff();
