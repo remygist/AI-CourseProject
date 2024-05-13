@@ -16,8 +16,8 @@ const userInterface = readline.createInterface({
 });
 
 async function getDiff() {
-    const diff = await git.diff();
-    connectAssistant(diff);
+    const diff = await git.diff(['--cached']);
+    await connectAssistant(diff);
 }
 
 async function connectAssistant(diff) {
@@ -42,6 +42,9 @@ async function connectAssistant(diff) {
         messages: [{ role: "system", content: content }],
         model: "gpt-3.5-turbo",
     });
+
+    console.log(completion.choices);
+
     const summary = JSON.parse(completion.choices[0].message.content);
     validateMessage(summary);
 }
@@ -58,20 +61,36 @@ async function validateMessage(summary){
     
     Do you want to modify the message, the description, or both? (message/description/both/no): `, (answer) => {
         const userInput = answer.trim().toLowerCase();
+        console.log(userInput);
         if (userInput === 'message' || userInput === 'both') {
-            modifyMessage(message);
+            modifyMessage('message');
         }
         if (userInput === 'description' || userInput === 'both') {
-            modifyMessage(message);
+            modifyMessage('description');
         }
         if (userInput === 'no') {
             commitMessage(message, description)
         }
+        else {
+            console.log('Invalid input. Please enter "message", "description", "both", or "no".');
+            validateMessage(summary);
+        }
     })
 }
 
-async function modifyMessage(content){
+let modifiedMessage = "";
+let modifiedDescription = "";
 
+async function modifyMessage(content){
+    userInterface.question(`Please enter your modified commit ${content}: `, async (modifiedText) => {
+        if (content === 'message') {
+            modifiedMessage = modifiedText;
+        } else if (content === 'description'){
+            modifiedDescription = modifiedText;
+        }
+
+        commitMessage(modifiedMessage, modifiedDescription);
+    })
 }
 
 async function commitMessage(message, description) {
@@ -83,6 +102,7 @@ async function commitMessage(message, description) {
     }
 
     console.log(commitContents);
+    userInterface.close();
    // const commit = await git.commit(commitContents);
 }
 
