@@ -2,12 +2,18 @@ const fs = require("fs");
 const simpleGit = require("simple-git");
 const git = simpleGit.default();
 const OpenAI = require("openai");
+const readline = require('readline');
 
 const openaiClient = new OpenAI({
     apiKey: "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",
 });
 
 const bestPractices = fs.readFileSync("best-practices.txt", "utf-8");
+
+const userInterface = readline.createInterface({
+    input: process.stdin,
+    output: process.stdout
+});
 
 async function getDiff() {
     const diff = await git.diff();
@@ -37,12 +43,38 @@ async function connectAssistant(diff) {
         model: "gpt-3.5-turbo",
     });
     const summary = JSON.parse(completion.choices[0].message.content);
-    commitMessage(summary);
+    validateMessage(summary);
 }
 
-async function commitMessage(summary) {
+async function validateMessage(summary){
     const { message, description } = summary;
 
+    userInterface.question(`
+    Generated commit message:
+    ${message}
+    
+    Generated commit description:
+    ${description}
+    
+    Do you want to modify the message, the description, or both? (message/description/both/no): `, (answer) => {
+        const userInput = answer.trim().toLowerCase();
+        if (userInput === 'message' || userInput === 'both') {
+            modifyMessage(message);
+        }
+        if (userInput === 'description' || userInput === 'both') {
+            modifyMessage(message);
+        }
+        if (userInput === 'no') {
+            commitMessage(message, description)
+        }
+    })
+}
+
+async function modifyMessage(content){
+
+}
+
+async function commitMessage(message, description) {
     await git.add(".");
 
     const commitContents = [message];
@@ -50,7 +82,8 @@ async function commitMessage(summary) {
         commitContents.push("-m", description);
     }
 
-    const commit = await git.commit(commitContents);
+    console.log(commitContents);
+   // const commit = await git.commit(commitContents);
 }
 
 getDiff();
