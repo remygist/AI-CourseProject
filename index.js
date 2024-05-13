@@ -1,4 +1,4 @@
-const fs = require('fs')
+const fs = require("fs");
 const simpleGit = require("simple-git");
 const git = simpleGit.default();
 const OpenAI = require("openai");
@@ -7,7 +7,7 @@ const openaiClient = new OpenAI({
     apiKey: "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",
 });
 
-const bestPractices = fs.readFileSync('best-practices.txt', 'utf-8')
+const bestPractices = fs.readFileSync("best-practices.txt", "utf-8");
 
 async function getDiff() {
     const diff = await git.diff();
@@ -37,7 +37,7 @@ async function connectAssistant(diff) {
         model: "gpt-3.5-turbo",
     });
     const summary = JSON.parse(completion.choices[0].message.content);
-    commitMessage(summary)
+    commitMessage(summary);
 }
 
 async function commitMessage(summary) {
@@ -47,13 +47,10 @@ async function commitMessage(summary) {
 
     const commitContents = [message];
     if (description) {
-        commitContents.push('-m', description);
+        commitContents.push("-m", description);
     }
 
     const commit = await git.commit(commitContents);
-
-    console.log(commit);
 }
 
 getDiff();
-
