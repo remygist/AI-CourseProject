@@ -16,7 +16,7 @@ const userInterface = readline.createInterface({
 });
 
 async function getDiff() {
-    const diff = await git.diff(['--cached']);
+    const diff = await git.diff();
     await connectAssistant(diff);
 }
 
@@ -35,7 +35,6 @@ async function connectAssistant(diff) {
         "message": __MESSAGE__,
         "description": __DESCRIPTION__
     }
-    
     This is what you have to resume: ${diff}`;
 
     const completion = await openaiClient.chat.completions.create({
@@ -43,7 +42,7 @@ async function connectAssistant(diff) {
         model: "gpt-3.5-turbo",
     });
 
-    console.log(completion.choices);
+    console.log(completion.choices[0].message.content);
 
     const summary = JSON.parse(completion.choices[0].message.content);
     validateMessage(summary);
@@ -59,39 +58,58 @@ async function validateMessage(summary){
     Generated commit description:
     ${description}
     
-    Do you want to modify the message, the description, or both? (message/description/both/no): `, (answer) => {
-        const userInput = answer.trim().toLowerCase();
-        console.log(userInput);
-        if (userInput === 'message' || userInput === 'both') {
-            modifyMessage('message');
+    Do you want to modify the message, the description, or both? (message/description/both/no): `,
+        (answer) => {
+            const userInput = answer.trim().toLowerCase();
+            console.log(userInput);
+            if (userInput === "message") {
+                userInterface.question(
+                    `Please enter your modified message: `,
+                    async (modifiedMessage) => {
+                        message = modifiedMessage;
+                        commitMessage(message, description);
+                    }
+                );
+            }
+            if (userInput === "description") {
+                userInterface.question(
+                    `Please enter your modified description: `,
+                    async (modifiedDescription) => {
+                        description = modifiedDescription;
+                        commitMessage(message, description);
+                    }
+                );
+            }
+            if (userInput === "both") {
+                userInterface.question(
+                    `Please enter your modified message: `,
+                    async (modifiedMessage) => {
+                        message = modifiedMessage;
+                    }
+                );
+                userInterface.question(
+                    `Please enter your modified description: `,
+                    async (modifiedDescription) => {
+                        description = modifiedDescription;
+                    }
+                );
+                commitMessage(message, description);
+            }
+            if (userInput === "no") {
+                commitMessage(message, description);
+            } else {
+                console.log(
+                    'Invalid input. Please enter "message", "description", "both", or "no".'
+                );
+                validateMessage(summary);
+            }
         }
-        if (userInput === 'description' || userInput === 'both') {
-            modifyMessage('description');
-        }
-        if (userInput === 'no') {
-            commitMessage(message, description)
-        }
-        else {
-            console.log('Invalid input. Please enter "message", "description", "both", or "no".');
-            validateMessage(summary);
-        }
-    })
+    );
 }
 
 let modifiedMessage = "";
 let modifiedDescription = "";
 
-async function modifyMessage(content){
-    userInterface.question(`Please enter your modified commit ${content}: `, async (modifiedText) => {
-        if (content === 'message') {
-            modifiedMessage = modifiedText;
-        } else if (content === 'description'){
-            modifiedDescription = modifiedText;
-        }
-
-        commitMessage(modifiedMessage, modifiedDescription);
-    })
-}
 
 async function commitMessage(message, description) {
     await git.add(".");
@@ -103,7 +121,7 @@ async function commitMessage(message, description) {
 
     console.log(commitContents);
     userInterface.close();
-   // const commit = await git.commit(commitContents);
+    const commit = await git.commit(commitContents);
 }
 
 getDiff();
