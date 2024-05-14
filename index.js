@@ -116,7 +116,7 @@ async function commitMessage(message, description) {
 
     const commitContents = [message];
     if (description) {
-        commitContents.push("-m", description);
+        commitContents.push(description);
     }
 
     console.log(commitContents);
