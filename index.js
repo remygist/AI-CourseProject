@@ -38,6 +38,14 @@ async function connectAssistant(diff) {
         "message": __MESSAGE__,
         "description": __DESCRIPTION__
     }
+
+    If there are no changes return in JSON format:
+
+    {
+        "message": null,
+        "description": null
+    }
+
     This is what you have to resume: ${diff}`;
 
     const completion = await openaiClient.chat.completions.create({
