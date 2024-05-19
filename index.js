@@ -64,7 +64,6 @@ async function validateMessage(summary){
     Do you want to modify the message, the description, or both? (message/description/both/no): `,
         (answer) => {
             const userInput = answer.trim().toLowerCase();
-            console.log(userInput);
             if (userInput === "message") {
                 userInterface.question(
                     `Please enter your modified message: `,
@@ -74,7 +73,7 @@ async function validateMessage(summary){
                     }
                 );
             }
-            if (userInput === "description") {
+            else if (userInput === "description") {
                 userInterface.question(
                     `Please enter your modified description: `,
                     async (modifiedDescription) => {
@@ -83,7 +82,7 @@ async function validateMessage(summary){
                     }
                 );
             }
-            if (userInput === "both") {
+            else if (userInput === "both") {
                 userInterface.question(
                     `Please enter your modified message: `,
                     async (modifiedMessage) => {
@@ -98,7 +97,7 @@ async function validateMessage(summary){
                 );
                 commitMessage(message, description);
             }
-            if (userInput === "no") {
+            else if (userInput === "no") {
                 commitMessage(message, description);
             } else {
                 console.log(
