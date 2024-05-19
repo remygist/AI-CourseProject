@@ -3,9 +3,12 @@ const simpleGit = require("simple-git");
 const git = simpleGit.default();
 const OpenAI = require("openai");
 const readline = require('readline');
+require('dotenv').config();
+
+const myApiKey = process.env.API_KEY;
 
 const openaiClient = new OpenAI({
-    apiKey: "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",
+    apiKey: myApiKey,
 });
 
 const bestPractices = fs.readFileSync("best-practices.txt", "utf-8");
@@ -49,7 +52,7 @@ async function connectAssistant(diff) {
 }
 
 async function validateMessage(summary){
-    const { message, description } = summary;
+    let { message, description } = summary;
 
     userInterface.question(`
     Generated commit message:
