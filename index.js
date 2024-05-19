@@ -130,3 +130,5 @@ async function commitMessage(message, description) {
 }
 
 getDiff();
+
+//dit is een test commentaar
