@@ -90,15 +90,15 @@ async function validateMessage(summary){
                     `Please enter your modified message: `,
                     async (modifiedMessage) => {
                         message = modifiedMessage;
+                        userInterface.question(
+                            `Please enter your modified description: `,
+                            async (modifiedDescription) => {
+                                description = modifiedDescription;
+                                commitMessage(message, description);
+                            }
+                        );
                     }
                 );
-                userInterface.question(
-                    `Please enter your modified description: `,
-                    async (modifiedDescription) => {
-                        description = modifiedDescription;
-                    }
-                );
-                commitMessage(message, description);
             }
             else if (userInput === "no") {
                 commitMessage(message, description);
