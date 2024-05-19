@@ -30,7 +30,7 @@ async function connectAssistant(diff) {
     You have to follow these best practices for creating git commit messages: 
     ${bestPractices}
     
-    You can't say anything else than what the commit message should be, and if needed the description. 
+    You can't say anything else than what the commit message should be, and if needed the description. If there are no changes, generate a message accordingly.
 
     You only output JSON, in the following format:
             
@@ -39,12 +39,7 @@ async function connectAssistant(diff) {
         "description": __DESCRIPTION__
     }
 
-    If there are no changes return in JSON format:
-
-    {
-        "message": null,
-        "description": null
-    }
+  
 
     This is what you have to resume: ${diff}`;
 
