@@ -31,3 +31,9 @@ CodeAndClear is a Node.js application that helps the process of creating git com
 2. Follow the prompts to review the generated commit message and description.
 3. Choose to modify the message, description, or both as needed.
 4. If no modifications are required, confirm to commit the changes.
+
+## Sources
+
+- [ChatGPT](https://chatgpt.com/) - Used for troubleshooting errors and guidance on component implementation.
+- Other Students
+- Exercises/Lessons
